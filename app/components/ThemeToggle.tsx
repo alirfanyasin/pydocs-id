@@ -62,7 +62,7 @@ export default function ThemeToggle() {
         theme === "dark" ? "Ganti ke Mode Terang" : "Ganti ke Mode Gelap"
       }
     >
-      <span>{theme === "dark" ? "☀️" : "🌙"}</span>
+      <span aria-hidden="true">{theme === "dark" ? "☼" : "◐"}</span>
       <span>{theme === "dark" ? "Terang" : "Gelap"}</span>
     </button>
   );
