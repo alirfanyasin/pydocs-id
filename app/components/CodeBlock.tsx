@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { CodeExample } from "../data/types";
 import PythonSyntaxEditor from "./PythonSyntaxEditor";
 import InlineCodeText from "./InlineCodeText";
+import { runPython } from "../lib/run-python";
 
 interface CodeBlockProps {
   example: CodeExample;
@@ -21,6 +22,7 @@ export default function CodeBlock({ example }: CodeBlockProps) {
   const [showOutput, setShowOutput] = useState(true);
   const [showExplanations, setShowExplanations] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
+  const [runStatus, setRunStatus] = useState("");
 
   const isModified = code !== example.code;
   const usesInput = /\binput\s*\(/.test(code);
@@ -46,23 +48,13 @@ export default function CodeBlock({ example }: CodeBlockProps) {
 
   const handleRunPython = async () => {
     setIsRunning(true);
+    setRunStatus("Menyiapkan Python...");
     setShowOutput(true);
     setErrorOutput("");
     setErrorHint("");
 
     try {
-      const response = await fetch("/api/run-python", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          code,
-          stdin: stdinValue,
-        }),
-      });
-
-      const data = await response.json();
+      const data = await runPython(code, stdinValue, setRunStatus);
       if (typeof data.output === "string") {
         setOutput(data.output);
       }
@@ -77,7 +69,7 @@ export default function CodeBlock({ example }: CodeBlockProps) {
       }
     } catch {
       setErrorOutput(
-        "Gagal menghubungi server eksekusi Python. Menampilkan output simulasi."
+        "Gagal menjalankan Python di browser. Coba muat ulang halaman."
       );
     } finally {
       setIsRunning(false);
@@ -105,6 +97,12 @@ export default function CodeBlock({ example }: CodeBlockProps) {
           <InlineCodeText text={example.description} />
         </p>
       </div>
+
+      {isRunning && (
+        <p role="status" className="px-4 py-2 text-xs text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700">
+          {runStatus}
+        </p>
+      )}
 
       {/* Code Editor Window */}
       <div className="bg-[#0f172a] text-slate-100">

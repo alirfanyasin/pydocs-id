@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { CodingChallenge } from "../data/types";
 import PythonSyntaxEditor from "./PythonSyntaxEditor";
 import InlineCodeText from "./InlineCodeText";
+import { runPython } from "../lib/run-python";
 
 interface CodingChallengeCardProps {
   challenge: CodingChallenge;
@@ -30,6 +31,7 @@ export default function CodingChallengeCard({
   const [errorOutput, setErrorOutput] = useState("");
   const [errorHint, setErrorHint] = useState("");
   const [isRunning, setIsRunning] = useState(false);
+  const [runStatus, setRunStatus] = useState("");
   const [isPassed, setIsPassed] = useState<boolean | null>(
     isCompleted ? true : null
   );
@@ -52,17 +54,12 @@ export default function CodingChallengeCard({
 
   const handleCheckCode = async () => {
     setIsRunning(true);
+    setRunStatus("Menyiapkan Python...");
     setErrorOutput("");
     setErrorHint("");
 
     try {
-      const response = await fetch("/api/run-python", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code, stdin: stdinValue }),
-      });
-
-      const data = await response.json();
+      const data = await runPython(code, stdinValue, setRunStatus);
       const actual = typeof data.output === "string" ? data.output.trim() : "";
       const expected = challenge.expectedOutput.trim();
 
@@ -81,7 +78,7 @@ export default function CodingChallengeCard({
         setIsPassed(false);
       }
     } catch {
-      setErrorOutput("Gagal menghubungi server eksekusi Python.");
+      setErrorOutput("Gagal menjalankan Python di browser. Coba muat ulang halaman.");
       setIsPassed(false);
     } finally {
       setIsRunning(false);
@@ -110,6 +107,12 @@ export default function CodingChallengeCard({
           : "border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900"
       }`}
     >
+      {isRunning && (
+        <p role="status" className="px-4 py-2 text-xs text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700">
+          {runStatus}
+        </p>
+      )}
+
       {/* Top Challenge Info */}
       <div className="p-5 border-b border-slate-200 dark:border-slate-800">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-3">

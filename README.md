@@ -31,6 +31,21 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 ## Deploy on Vercel
 
+The code editor runs Python in the browser using Pyodide 0.28.3 in a dedicated
+Web Worker. Both examples and coding challenges use the same runner. No Python
+binary, backend service, or environment variable is required on Vercel.
+
+The browser must be able to access `https://cdn.jsdelivr.net` to download the
+runtime and imported packages (including NumPy and Pandas). The first run can
+take longer while these files download; the UI displays loading progress.
+Execution has a separate four-second limit after package loading. Each run
+uses a new worker so variables and files do not leak between exercises.
+
+`POST /api/run-python` is retired and returns HTTP 410. After deploying, reload
+any already-open tabs so they use the browser runner instead of the old API.
+
+Runner regression checks: `node --test tests/run-python.test.cjs`.
+
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
