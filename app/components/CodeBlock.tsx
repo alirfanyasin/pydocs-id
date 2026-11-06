@@ -5,12 +5,14 @@ import { CodeExample } from "../data/types";
 import PythonSyntaxEditor from "./PythonSyntaxEditor";
 import InlineCodeText from "./InlineCodeText";
 import { runPython } from "../lib/run-python";
+import { useEditorPersistence } from "../lib/use-browser-state";
 
 interface CodeBlockProps {
   example: CodeExample;
+  storageScope: string;
 }
 
-export default function CodeBlock({ example }: CodeBlockProps) {
+export default function CodeBlock({ example, storageScope }: CodeBlockProps) {
   const [code, setCode] = useState(example.code);
   const [stdinValue, setStdinValue] = useState(example.defaultStdin ?? "");
   const [output, setOutput] = useState(example.output);
@@ -23,6 +25,15 @@ export default function CodeBlock({ example }: CodeBlockProps) {
   const [showExplanations, setShowExplanations] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
   const [runStatus, setRunStatus] = useState("");
+
+  useEditorPersistence(`${storageScope}:example:${example.id}`, { code, stdinValue, output, errorOutput, errorHint, execTimeMs }, (saved) => {
+    setCode(saved.code as string);
+    setStdinValue(saved.stdinValue as string);
+    setOutput(saved.output as string);
+    setErrorOutput(saved.errorOutput as string);
+    setErrorHint(saved.errorHint as string);
+    setExecTimeMs(saved.execTimeMs as number | null);
+  });
 
   const isModified = code !== example.code;
   const usesInput = /\binput\s*\(/.test(code);

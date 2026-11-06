@@ -1,46 +1,27 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { PYTHON_OOP_DOCS, DocSection } from "../data";
 import CodeBlock from "../components/CodeBlock";
 import CodingChallengeCard from "../components/CodingChallengeCard";
 import InlineCodeText from "../components/InlineCodeText";
 import ThemeToggle from "../components/ThemeToggle";
+import SearchIcon from "../components/SearchIcon";
+import { useBrowserState } from "../lib/use-browser-state";
+import { isStringList, isQuizAnswers, isChapterId } from "../lib/browser-storage";
 
 const STORAGE_OOP_COMPLETED_KEY = "pydocs_oop_completed_ids_v1";
 const STORAGE_PASSED_CHALLENGES_KEY = "pydocs_passed_challenges_v1";
 const STORAGE_QUIZ_ANSWERS_KEY = "pydocs_quiz_answers_v1";
 
 export default function PythonOopTutorialPage() {
-  const [activeId, setActiveId] = useState<string>(PYTHON_OOP_DOCS[0].id);
-  const [completedIds, setCompletedIds] = useState<string[]>([]);
-  const [passedChallengeIds, setPassedChallengeIds] = useState<string[]>([]);
-  const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>({});
+  const [activeId, setActiveId] = useBrowserState<string>("pydocs_python-oop_active_id_v1", PYTHON_OOP_DOCS[0].id, isChapterId);
+  const [completedIds, setCompletedIds] = useBrowserState<string[]>(STORAGE_OOP_COMPLETED_KEY, [], isStringList);
+  const [passedChallengeIds, setPassedChallengeIds] = useBrowserState<string[]>(STORAGE_PASSED_CHALLENGES_KEY, [], isStringList);
+  const [quizAnswers, setQuizAnswers] = useBrowserState<Record<string, number>>(STORAGE_QUIZ_ANSWERS_KEY, {}, isQuizAnswers);
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  // Load saved progress, challenges, and quizzes from localStorage
-  useEffect(() => {
-    try {
-      const savedCompleted = localStorage.getItem(STORAGE_OOP_COMPLETED_KEY);
-      if (savedCompleted) {
-        setCompletedIds(JSON.parse(savedCompleted));
-      }
-      const savedChallenges = localStorage.getItem(
-        STORAGE_PASSED_CHALLENGES_KEY
-      );
-      if (savedChallenges) {
-        setPassedChallengeIds(JSON.parse(savedChallenges));
-      }
-      const savedQuizzes = localStorage.getItem(STORAGE_QUIZ_ANSWERS_KEY);
-      if (savedQuizzes) {
-        setQuizAnswers(JSON.parse(savedQuizzes));
-      }
-    } catch {
-      // Ignore storage errors
-    }
-  }, []);
 
   const allDocs = PYTHON_OOP_DOCS;
 
@@ -97,11 +78,6 @@ export default function PythonOopTutorialPage() {
     setCompletedIds((prev) => {
       if (prev.includes(id)) return prev;
       const next = [...prev, id];
-      try {
-        localStorage.setItem(STORAGE_OOP_COMPLETED_KEY, JSON.stringify(next));
-      } catch {
-        // Ignore
-      }
       return next;
     });
   };
@@ -111,11 +87,6 @@ export default function PythonOopTutorialPage() {
       const next = prev.includes(id)
         ? prev.filter((item) => item !== id)
         : [...prev, id];
-      try {
-        localStorage.setItem(STORAGE_OOP_COMPLETED_KEY, JSON.stringify(next));
-      } catch {
-        // Ignore
-      }
       return next;
     });
   };
@@ -124,14 +95,6 @@ export default function PythonOopTutorialPage() {
     setPassedChallengeIds((prev) => {
       if (prev.includes(challengeId)) return prev;
       const next = [...prev, challengeId];
-      try {
-        localStorage.setItem(
-          STORAGE_PASSED_CHALLENGES_KEY,
-          JSON.stringify(next)
-        );
-      } catch {
-        // Ignore
-      }
       return next;
     });
   };
@@ -139,11 +102,6 @@ export default function PythonOopTutorialPage() {
   const handleSelectQuizOption = (answerKey: string, optIdx: number) => {
     setQuizAnswers((prev) => {
       const next = { ...prev, [answerKey]: optIdx };
-      try {
-        localStorage.setItem(STORAGE_QUIZ_ANSWERS_KEY, JSON.stringify(next));
-      } catch {
-        // Ignore
-      }
       return next;
     });
   };
@@ -153,11 +111,6 @@ export default function PythonOopTutorialPage() {
       const copy = { ...prev };
       for (let i = 0; i < count; i++) {
         delete copy[`${docId}-${i}`];
-      }
-      try {
-        localStorage.setItem(STORAGE_QUIZ_ANSWERS_KEY, JSON.stringify(copy));
-      } catch {
-        // Ignore
       }
       return copy;
     });
@@ -251,7 +204,7 @@ export default function PythonOopTutorialPage() {
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
       {/* Top Navbar */}
       <header className="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-300 dark:border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           {/* Left: Back to Catalog & Brand */}
           <div className="flex items-center gap-3">
             <button
@@ -289,15 +242,14 @@ export default function PythonOopTutorialPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Cari bab atau konsep OOP (contoh: class, __init__, super, property)..."
-                className="w-full rounded-md border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 pl-9 pr-4 py-1.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-slate-200"
+                className="w-full rounded-md border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 pl-9 pr-9 py-1.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-slate-200"
               />
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">
-                🔍
-              </span>
+              <SearchIcon className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery("")}
+                  aria-label="Hapus pencarian"
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 cursor-pointer"
                 >
                   ✕
@@ -328,22 +280,23 @@ export default function PythonOopTutorialPage() {
       </header>
 
       {/* Main Layout */}
-      <div className="max-w-7xl w-full mx-auto flex-1 flex flex-col lg:flex-row px-4 sm:px-6 lg:px-8 py-6 gap-6">
+      <div className="max-w-[1440px] w-full mx-auto flex-1 flex flex-col lg:flex-row px-4 sm:px-6 lg:px-8 py-6 gap-6">
         {/* Sidebar Navigation */}
         <aside id="chapter-navigation"
           className={`${
             mobileMenuOpen ? "block" : "hidden"
-          } lg:block w-full lg:w-64 shrink-0`}
+          } lg:block w-full lg:w-80 xl:w-88 shrink-0`}
         >
           <div className="sticky top-22 bg-white dark:bg-slate-900 rounded-md border border-slate-300 dark:border-slate-700 p-4">
             {/* Mobile search */}
-            <div className="mb-3 md:hidden">
+            <div className="relative mb-3 md:hidden">
+              <SearchIcon className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Cari materi OOP..."
-                className="w-full rounded-md border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 px-3 py-2 text-sm"
+                className="w-full rounded-md border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 pl-9 pr-3 py-2 text-sm"
               />
             </div>
 
@@ -363,6 +316,7 @@ export default function PythonOopTutorialPage() {
                 return (
                   <button
                     key={doc.id}
+                    aria-current={isActive ? "page" : undefined}
                     type="button"
                     onClick={() => {
                       setActiveId(doc.id);
@@ -609,7 +563,7 @@ export default function PythonOopTutorialPage() {
 
               <div className="space-y-5">
                 {activeDoc.examples.map((example) => (
-                  <CodeBlock key={example.id} example={example} />
+                  <CodeBlock key={example.id} example={example} storageScope="python-oop" />
                 ))}
               </div>
             </section>
@@ -705,6 +659,7 @@ export default function PythonOopTutorialPage() {
               <div className="space-y-5">
                 {activeCaseStudies.map((caseStudy, idx) => (
                   <CodingChallengeCard
+                    storageScope="python-oop"
                     key={caseStudy.id}
                     challenge={caseStudy}
                     index={idx}
@@ -746,6 +701,7 @@ export default function PythonOopTutorialPage() {
               <div className="space-y-5">
                 {activeChallenges.map((challenge, idx) => (
                   <CodingChallengeCard
+                    storageScope="python-oop"
                     key={challenge.id}
                     challenge={challenge}
                     index={idx}

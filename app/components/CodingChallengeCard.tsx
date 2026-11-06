@@ -5,9 +5,11 @@ import { CodingChallenge } from "../data/types";
 import PythonSyntaxEditor from "./PythonSyntaxEditor";
 import InlineCodeText from "./InlineCodeText";
 import { runPython } from "../lib/run-python";
+import { useEditorPersistence } from "../lib/use-browser-state";
 
 interface CodingChallengeCardProps {
   challenge: CodingChallenge;
+  storageScope: string;
   index: number;
   isCompleted?: boolean;
   onPass?: (challengeId: string) => void;
@@ -18,6 +20,7 @@ interface CodingChallengeCardProps {
 
 export default function CodingChallengeCard({
   challenge,
+  storageScope,
   index,
   isCompleted = false,
   onPass,
@@ -37,6 +40,15 @@ export default function CodingChallengeCard({
   );
   const [showHint, setShowHint] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
+
+  useEditorPersistence(`${storageScope}:challenge:${challenge.id}`, { code, stdinValue, userOutput, errorOutput, errorHint, isPassed }, (saved) => {
+    setCode(saved.code as string);
+    setStdinValue(saved.stdinValue as string);
+    setUserOutput(saved.userOutput as string | null);
+    setErrorOutput(saved.errorOutput as string);
+    setErrorHint(saved.errorHint as string);
+    setIsPassed(saved.isPassed as boolean | null);
+  });
 
   const usesInput = /\binput\s*\(/.test(code);
   const passedStatus = isPassed === true || isCompleted;

@@ -46,6 +46,16 @@ any already-open tabs so they use the browser runner instead of the old API.
 
 Runner regression checks: `node --test tests/run-python.test.cjs`.
 
+Learning progress, quiz answers, and the last chapter stay in each visitor's
+localStorage using the existing progress keys. Edited code, input, and the last
+result are saved in a separate bounded draft store: writes are batched for 500 ms
+and flushed when leaving the page. Drafts are limited to 80 recent entries and
+roughly 1 MB, expire after 90 days, and keep only a short output preview. Draft
+cleanup never removes chapter/quiz progress. Data stays on that browser and
+does not sync to other devices; clearing site data removes it.
+
+Storage regression checks: `node --test tests/browser-storage.test.cjs`.
+
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
