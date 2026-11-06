@@ -1,0 +1,149 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --scrollbar-thumb: rgba(148, 163, 184, 0.55);
+  --scrollbar-thumb-hover: rgba(100, 116, 139, 0.85);
+}
+
+.dark {
+  --background: #020617;
+  --foreground: #f1f5f9;
+  --scrollbar-thumb: rgba(71, 85, 105, 0.65);
+  --scrollbar-thumb-hover: rgba(100, 116, 139, 0.95);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Custom WebKit/Blink scrollbar (without scrollbar-width/scrollbar-color so Chromium uses ::-webkit-scrollbar) */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Shared palette: neutral surfaces and one restrained evergreen accent. */
+@theme {
+  --color-slate-50: #f7f8f6;
+  --color-slate-100: #eff1ee;
+  --color-slate-200: #dfe3de;
+  --color-slate-300: #c9cfc9;
+  --color-slate-400: #929c95;
+  --color-slate-500: #65716a;
+  --color-slate-600: #505c55;
+  --color-slate-700: #354039;
+  --color-slate-800: #252e28;
+  --color-slate-900: #1b221e;
+  --color-slate-950: #121713;
+  --color-blue-50: #eef5f1;
+  --color-blue-100: #dcece2;
+  --color-blue-200: #bfd9c9;
+  --color-blue-300: #96bda5;
+  --color-blue-400: #7cab90;
+  --color-blue-500: #507f64;
+  --color-blue-600: #36664c;
+  --color-blue-700: #2b553e;
+  --color-blue-800: #254633;
+  --color-blue-900: #203c2d;
+  --color-blue-950: #172b20;
+  --radius-md: 4px;
+  --radius-lg: 4px;
+  --radius-xl: 6px;
+}
+:root { --background: #f7f8f6; --foreground: #1b221e; }
+.dark { --background: #121713; --foreground: #eff1ee; color-scheme: dark; }
+html { scroll-padding-top: 6rem; }
+body { line-height: 1.6; }
+button, a, input, textarea { -webkit-tap-highlight-color: transparent; }
+a, button, input, textarea { touch-action: manipulation; }
+:focus-visible { outline: 2px solid var(--color-blue-500); outline-offset: 4px; }
+::selection { background: #bfd9c9; color: #172b20; }
+h1, h2, h3 { text-wrap: balance; }
+pre, code, textarea { tab-size: 4; }
+header { flex-shrink: 0; }
+.catalog-container { width: min(100% - 3rem, 1080px); margin-inline: auto; }
+.catalog-header { border-bottom: 1px solid var(--color-slate-200); }
+.dark .catalog-header { border-color: var(--color-slate-800); }
+.brand { display: inline-flex; align-items: center; gap: .7rem; font-weight: 650; font-size: .95rem; letter-spacing: -.025em; }
+.brand-mark { display: grid; place-items: center; width: 32px; height: 32px; background: var(--color-foreground); color: var(--color-background); border-radius: 3px; font-family: var(--font-geist-mono), monospace; font-size: .9rem; }
+.catalog-intro { padding-block: 5rem 4.5rem; max-width: 680px; }
+.eyebrow { font-size: .68rem; font-weight: 600; letter-spacing: .13em; color: var(--color-slate-500); }
+.dark .eyebrow { color: var(--color-slate-400); }
+.catalog-intro h1 { font-size: clamp(2.5rem, 5vw, 4.2rem); line-height: 1.12; letter-spacing: -.055em; font-weight: 550; margin-top: 1.25rem; }
+.intro-description { max-width: 470px; margin-top: 1.5rem; color: var(--color-slate-600); font-size: .98rem; line-height: 1.8; }
+.dark .intro-description { color: var(--color-slate-400); }
+.primary-link { display: inline-flex; align-items: center; gap: 2rem; margin-top: 1.8rem; padding: .7rem 1rem; background: var(--color-blue-700); color: white; border-radius: 4px; font-size: .85rem; font-weight: 500; transition: background .15s; }
+.primary-link:hover { background: var(--color-blue-600); }
+.catalog-section-heading { display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 1rem; }
+.catalog-section-heading h2 { font-size: 1.1rem; font-weight: 600; letter-spacing: -.025em; }
+.catalog-section-heading > span { font-family: var(--font-geist-mono), monospace; font-size: .72rem; color: var(--color-slate-500); }
+.track-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.track-card { display: flex; flex-direction: column; padding: 1.6rem; background: white; border: 1px solid var(--color-slate-200); border-radius: 4px; transition: border-color .15s, background .15s; }
+.dark .track-card { background: var(--color-slate-900); border-color: var(--color-slate-800); }
+.track-card:hover { border-color: var(--color-blue-500); background: var(--color-blue-50); }
+.dark .track-card:hover { background: #1e2922; border-color: var(--color-blue-500); }
+.track-number { font-family: var(--font-geist-mono), monospace; font-size: .75rem; color: var(--color-slate-500); }
+.track-card h3 { font-size: 1.3rem; font-weight: 550; letter-spacing: -.03em; margin-top: 1.5rem; }
+.track-description { font-size: .875rem; color: var(--color-slate-600); margin-top: .6rem; line-height: 1.75; max-width: 370px; }
+.dark .track-description { color: var(--color-slate-300); }
+.track-topics { font-size: .72rem; color: var(--color-slate-500); margin-block: 1rem 1.6rem; }
+.dark .track-topics, .dark .track-number { color: var(--color-slate-400); }
+.track-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: auto; font-size: .75rem; color: var(--color-slate-500); }
+.track-action { color: var(--color-blue-700); font-weight: 600; display: inline-flex; gap: 1.1rem; }
+.dark .track-action { color: var(--color-blue-300); }
+.track-progress { height: 2px; margin-top: 1rem; background: var(--color-slate-100); }
+.dark .track-progress { background: var(--color-slate-800); }
+.track-progress span { display: block; height: 100%; background: var(--color-blue-500); }
+.upcoming { margin-top: 1.5rem; padding-block: 1.5rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.5rem; border-top: 1px solid var(--color-slate-200); }
+.dark .upcoming { border-color: var(--color-slate-800); }
+.upcoming p { font-size: .8rem; color: var(--color-slate-500); flex: 1; }
+.dark .upcoming p { color: var(--color-slate-400); }
+.upcoming p span { padding-inline: .65rem; opacity: .5; }
+.catalog-footer { padding-block: 1.5rem; border-top: 1px solid var(--color-slate-200); display: flex; justify-content: space-between; gap: 1rem; color: var(--color-slate-500); font-size: .7rem; }
+.dark .catalog-footer { border-color: var(--color-slate-800); }
+@media (max-width: 640px) {
+  .catalog-container { width: calc(100% - 2rem); }
+  .catalog-intro { padding-block: 3rem; }
+  .track-grid { grid-template-columns: 1fr; }
+  .track-card { padding: 1.25rem; }
+  .upcoming { align-items: flex-start; flex-direction: column; gap: .65rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0s !important; animation-duration: 0s !important; }
+}
