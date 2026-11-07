@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { INITIAL_PYTHON_DOCS, PYTHON_OOP_DOCS, PYTHON_NUMPY_DOCS, PYTHON_PANDAS_DOCS } from "./data";
+import { INITIAL_PYTHON_DOCS, PYTHON_OOP_DOCS, PYTHON_NUMPY_DOCS, PYTHON_PANDAS_DOCS, PYTHON_MATPLOTLIB_DOCS } from "./data";
 import ThemeToggle from "./components/ThemeToggle";
 
 const tracks = [
@@ -10,6 +10,7 @@ const tracks = [
   { slug: "python-oop", title: "Object-Oriented Python", level: "Menengah", description: "Susun kode dengan class, pewarisan, dan komposisi objek.", topics: "Class · Inheritance · Dataclass", docs: PYTHON_OOP_DOCS, storage: "pydocs_oop_completed_ids_v1" },
   { slug: "python-numpy", title: "NumPy", level: "Menengah", description: "Olah array dan matriks untuk perhitungan numerik yang efisien.", topics: "Array · Broadcasting · Aljabar linear", docs: PYTHON_NUMPY_DOCS, storage: "pydocs_numpy_completed_ids_v1" },
   { slug: "python-pandas", title: "Pandas", level: "Menengah", description: "Baca, bersihkan, dan analisis data tabel dengan Python.", topics: "DataFrame · Data cleaning · Agregasi", docs: PYTHON_PANDAS_DOCS, storage: "pydocs_pandas_completed_ids_v1" },
+  { slug: "python-matplotlib", title: "Matplotlib", level: "Menengah", description: "Ubah data menjadi grafik yang jelas dan informatif dengan Python.", topics: "Figure & Axes · Jenis grafik · Subplot & ekspor", docs: PYTHON_MATPLOTLIB_DOCS, storage: "pydocs_matplotlib_completed_ids_v1" },
 ];
 
 export default function LearningCatalogHomePage() {
@@ -42,7 +43,7 @@ export default function LearningCatalogHomePage() {
           <Link href={startedTrack ? `/${startedTrack.slug}` : "/python-dasar"} className="primary-link">{startedTrack ? "Lanjut belajar" : "Mulai dari dasar"}<span aria-hidden="true">↗</span></Link>
         </section>
         <section aria-labelledby="catalog-title" className="pb-16">
-          <div className="catalog-section-heading"><h2 id="catalog-title">Materi belajar</h2><span>04 modul</span></div>
+          <div className="catalog-section-heading"><h2 id="catalog-title">Materi belajar</h2><span>{String(tracks.length).padStart(2, "0")} modul</span></div>
           <div className="track-grid">
             {tracks.map((track, index) => {
               const completed = progress[track.slug] || 0;

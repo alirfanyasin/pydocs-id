@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { CodingChallenge } from "../data/types";
 import PythonSyntaxEditor from "./PythonSyntaxEditor";
 import InlineCodeText from "./InlineCodeText";
+import PlotOutput from "./PlotOutput";
 import { runPython } from "../lib/run-python";
 import { useEditorPersistence } from "../lib/use-browser-state";
 
@@ -33,6 +34,7 @@ export default function CodingChallengeCard({
   const [userOutput, setUserOutput] = useState<string | null>(null);
   const [errorOutput, setErrorOutput] = useState("");
   const [errorHint, setErrorHint] = useState("");
+  const [images, setImages] = useState<string[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [runStatus, setRunStatus] = useState("");
   const [isPassed, setIsPassed] = useState<boolean | null>(
@@ -65,6 +67,7 @@ export default function CodingChallengeCard({
   };
 
   const handleCheckCode = async () => {
+    setImages([]);
     setIsRunning(true);
     setRunStatus("Menyiapkan Python...");
     setErrorOutput("");
@@ -72,6 +75,7 @@ export default function CodingChallengeCard({
 
     try {
       const data = await runPython(code, stdinValue, setRunStatus);
+      setImages(data.images ?? []);
       const actual = typeof data.output === "string" ? data.output.trim() : "";
       const expected = challenge.expectedOutput.trim();
 
@@ -98,6 +102,7 @@ export default function CodingChallengeCard({
   };
 
   const handleReset = () => {
+    setImages([]);
     setCode(challenge.starterCode);
     setStdinValue(challenge.defaultStdin ?? "");
     setUserOutput(null);
@@ -192,6 +197,7 @@ export default function CodingChallengeCard({
             <pre className="font-mono text-xs sm:text-sm text-emerald-300 whitespace-pre-wrap leading-relaxed">
               {challenge.expectedOutput}
             </pre>
+            <PlotOutput images={challenge.expectedImages ?? []} caption="Target visualisasi" />
           </div>
         </div>
       </div>
@@ -338,6 +344,7 @@ export default function CodingChallengeCard({
                   </p>
                 )
               )}
+              <PlotOutput images={images} />
               {errorOutput && (
                 <div className="mt-2 space-y-2">
                   <pre className="font-mono text-xs sm:text-sm text-rose-300 bg-rose-950/50 border border-rose-700/80 p-3 rounded-md whitespace-pre-wrap leading-relaxed">

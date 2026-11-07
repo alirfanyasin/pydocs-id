@@ -1,4 +1,5 @@
 import { DocSection } from "./types";
+import { withMatplotlibPreviews } from "./with-matplotlib-previews";
 import { bab1Pengenalan } from "./chapters/bab1-pengenalan";
 import { bab2VariabelTipeData } from "./chapters/bab2-variabel-tipe-data";
 import { bab3ManipulasiString } from "./chapters/bab3-manipulasi-string";
@@ -39,6 +40,16 @@ import { bab6DataCleaning } from "./pandas-chapters/bab6-data-cleaning";
 import { bab7GroupbyAgregasi } from "./pandas-chapters/bab7-groupby-agregasi";
 import { bab8ConcatMerge } from "./pandas-chapters/bab8-concat-merge";
 import { bab9UjianPandas } from "./pandas-chapters/bab9-ujian-pandas";
+
+import { bab1Matplotlib } from "./matplotlib-chapters/bab1-figure-axes";
+import { bab2Matplotlib } from "./matplotlib-chapters/bab2-line-styling";
+import { bab3Matplotlib } from "./matplotlib-chapters/bab3-label-legenda-anotasi";
+import { bab4Matplotlib } from "./matplotlib-chapters/bab4-bar-pie";
+import { bab5Matplotlib } from "./matplotlib-chapters/bab5-scatter-korelasi";
+import { bab6Matplotlib } from "./matplotlib-chapters/bab6-histogram-boxplot";
+import { bab7Matplotlib } from "./matplotlib-chapters/bab7-subplot-layout";
+import { bab8Matplotlib } from "./matplotlib-chapters/bab8-heatmap-ekspor";
+import { bab9UjianMatplotlib } from "./matplotlib-chapters/bab9-ujian-matplotlib";
 
 export * from "./types";
 
@@ -90,3 +101,16 @@ export const PYTHON_PANDAS_DOCS: DocSection[] = [
   bab8ConcatMerge,
   bab9UjianPandas,
 ];
+
+
+export const PYTHON_MATPLOTLIB_DOCS: DocSection[] = [
+  bab1Matplotlib,
+  bab2Matplotlib,
+  bab3Matplotlib,
+  bab4Matplotlib,
+  bab5Matplotlib,
+  bab6Matplotlib,
+  bab7Matplotlib,
+  bab8Matplotlib,
+  bab9UjianMatplotlib,
+].map(withMatplotlibPreviews);

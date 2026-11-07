@@ -14,6 +14,10 @@ self.onmessage = async ({ data: { code, stdin } }) => {
     pyodide = await loadPyodide({ indexURL: PYODIDE_URL });
     self.postMessage({ type: "status", message: "Menyiapkan pustaka…" });
     await pyodide.loadPackagesFromImports(code);
+    // The worker has no DOM; render Matplotlib figures using its PNG backend.
+    if (pyodide.loadedPackages?.matplotlib) {
+      pyodide.runPython("import matplotlib; matplotlib.use('Agg', force=True); import matplotlib.pyplot");
+    }
 
     // A raw stream captures input() prompts and print(..., end="") exactly.
     const decoder = new TextDecoder();
@@ -60,7 +64,22 @@ finally:
     sys.stdin = previous_stdin
 error
 `, { globals: context });
-    self.postMessage({ type: "result", output: output.trimEnd(), error: (stderr + result).slice(0, 32_000).trimEnd(), executionTimeMs: Math.round(performance.now() - startedAt) });
+    let images = [];
+    if (pyodide.runPython("'matplotlib.pyplot' in __import__('sys').modules")) {
+      const plots = pyodide.runPython(`
+import matplotlib.pyplot as _plt, base64 as _base64, io as _io
+_images = []
+for _number in _plt.get_fignums()[:4]:
+    _buffer = _io.BytesIO()
+    _plt.figure(_number).savefig(_buffer, format="png", dpi=90, bbox_inches="tight")
+    _images.append("data:image/png;base64," + _base64.b64encode(_buffer.getvalue()).decode("ascii"))
+_plt.close("all")
+_images
+`);
+      images = plots.toJs();
+      plots.destroy();
+    }
+    self.postMessage({ type: "result", output: output.trimEnd(), images, error: (stderr + result).slice(0, 32_000).trimEnd(), executionTimeMs: Math.round(performance.now() - startedAt) });
   } catch (error) {
     self.postMessage({
       type: "result",

@@ -1,6 +1,7 @@
 import { getFriendlyErrorExplanation } from "./python-errors";
 
 export interface PythonResult {
+  images?: string[];
   output: string;
   error: string;
   errorHint: string;
@@ -60,6 +61,7 @@ export function runPython(
       } else if (data.type === "result") {
         finish({
           output: data.output,
+          images: Array.isArray(data.images) ? data.images.filter((src: unknown): src is string => typeof src === "string" && src.startsWith("data:image/png;base64,")) : [],
           error: data.error,
           errorHint: getFriendlyErrorExplanation(data.error),
           executionTimeMs: data.executionTimeMs,

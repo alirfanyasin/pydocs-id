@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { CodeExample } from "../data/types";
 import PythonSyntaxEditor from "./PythonSyntaxEditor";
 import InlineCodeText from "./InlineCodeText";
+import PlotOutput from "./PlotOutput";
 import { runPython } from "../lib/run-python";
 import { useEditorPersistence } from "../lib/use-browser-state";
 
@@ -23,6 +24,8 @@ export default function CodeBlock({ example, storageScope }: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
   const [showOutput, setShowOutput] = useState(true);
   const [showExplanations, setShowExplanations] = useState(true);
+  const [images, setImages] = useState<string[]>([]);
+  const [hasRun, setHasRun] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [runStatus, setRunStatus] = useState("");
 
@@ -49,6 +52,8 @@ export default function CodeBlock({ example, storageScope }: CodeBlockProps) {
   };
 
   const handleReset = () => {
+    setHasRun(false);
+    setImages([]);
     setCode(example.code);
     setStdinValue(example.defaultStdin ?? "");
     setOutput(example.output);
@@ -58,6 +63,8 @@ export default function CodeBlock({ example, storageScope }: CodeBlockProps) {
   };
 
   const handleRunPython = async () => {
+    setHasRun(true);
+    setImages([]);
     setIsRunning(true);
     setRunStatus("Menyiapkan Python...");
     setShowOutput(true);
@@ -66,6 +73,7 @@ export default function CodeBlock({ example, storageScope }: CodeBlockProps) {
 
     try {
       const data = await runPython(code, stdinValue, setRunStatus);
+      setImages(data.images ?? []);
       if (typeof data.output === "string") {
         setOutput(data.output);
       }
@@ -244,6 +252,7 @@ export default function CodeBlock({ example, storageScope }: CodeBlockProps) {
               </pre>
             )}
 
+            <PlotOutput images={hasRun ? images : example.previewImages ?? []} caption={hasRun ? "Hasil visualisasi kode kamu" : "Pratinjau hasil contoh"} />
             {errorOutput && (
               <div className="mt-2 space-y-2">
                 <pre className="font-mono text-xs sm:text-sm text-rose-300 bg-rose-950/50 border border-rose-700/80 p-3 rounded-md whitespace-pre-wrap leading-relaxed">
@@ -257,7 +266,7 @@ export default function CodeBlock({ example, storageScope }: CodeBlockProps) {
               </div>
             )}
 
-            {!output && !errorOutput && (
+            {!output && !errorOutput && images.length === 0 && (
               <p className="font-mono text-xs text-slate-500 italic">
                 (Program selesai dijalankan tanpa mencetak output)
               </p>

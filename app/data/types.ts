@@ -1,4 +1,5 @@
 export interface CodeExample {
+  previewImages?: string[];
   id: string;
   title: string;
   description: string;
@@ -19,6 +20,7 @@ export interface QuizItem {
 }
 
 export interface CodingChallenge {
+  expectedImages?: string[];
   id: string;
   title: string;
   difficulty: "Mudah" | "Sedang" | "Menantang";

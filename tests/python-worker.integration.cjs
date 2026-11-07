@@ -8,8 +8,10 @@ const { loadPyodide } = require(runtimeDir);
 const script = fs.readFileSync('public/python-worker.js', 'utf8');
 (async () => {
  const pyodide = await loadPyodide({indexURL: runtimeDir});
- await pyodide.loadPackage(['numpy', 'pandas'], {messageCallback: console.log, errorCallback: console.error});
+ await pyodide.loadPackage(['numpy', 'pandas', 'matplotlib'], {messageCallback: console.log, errorCallback: console.error});
  const cases = [
+  { code: 'import matplotlib.pyplot as plt\nfig, ax = plt.subplots()\nax.plot([1, 2], [3, 5])\nprint(len(ax.lines))', output: '1', images: 1 },
+  { code: 'import matplotlib.pyplot as plt\nplt.subplots()\nplt.subplots()\nprint("dua grafik")', output: 'dua grafik', images: 2 },
   { code: 'print("Halo Python"); print(25 + 75)', output: 'Halo Python\n100' },
   { code: 'nama = input("Nama: "); print("Halo", nama)', stdin: 'Irfan', output: 'Nama: Halo Irfan' },
   { code: 'print(input()); print(input())', stdin: 'satu\ndua\n', output: 'satu\ndua' },
@@ -33,6 +35,8 @@ const script = fs.readFileSync('public/python-worker.js', 'utf8');
   if (result.error && !item.error) console.error(result.error);
   if (item.output !== undefined) assert.equal(result.output, item.output);
   if (item.length) assert.equal(result.output.length, item.length);
+  assert.equal(result.images?.length || 0, item.images || 0);
+  for (const image of result.images || []) assert.ok(image.startsWith('data:image/png;base64,iVBOR'));
   if (item.error) assert.match(result.error, item.error); else assert.equal(result.error, '');
   console.log('PASS', item.code.split('\n')[0].slice(0, 65));
  }

@@ -38,6 +38,17 @@ test("empty code does not start a worker", async () => {
   assert.equal(workers.length, 0);
 });
 
+test("forwards PNG plots and discards unexpected image sources", async () => {
+  const { runPython, workers } = loadRunner();
+  const done = runPython("import matplotlib.pyplot as plt");
+  workers[0].send({ type: "result", output: "1", error: "", executionTimeMs: 5,
+    images: ["data:image/png;base64,aGVsbG8=", "https://example.com/image.png", null] });
+  const result = await done;
+  assert.equal(result.output, "1");
+  assert.deepEqual(Array.from(result.images), ["data:image/png;base64,aGVsbG8="]);
+  assert.equal(workers[0].terminated, true);
+});
+
 test("passes code and stdin, forwards status, and terminates after a result", async () => {
   const { runPython, workers, timers } = loadRunner();
   const statuses = [];
